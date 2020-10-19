@@ -1,0 +1,26 @@
+@startuml
+skinparam monochrome true
+legend top left
+Data model style
+Generalization style
+end legend
+
+Object "Administrative Domain" as AdministrativeDomain
+Object Region
+Object "Compute Node" as ComputeNode
+Object Thing
+Object Microservice
+Object Application
+Object Service
+Object "External Endpoint" as ExternalEndpoint
+
+AdministrativeDomain -- "1..*" Region
+Region -- Region: link
+Region -- "0..*" Thing
+Region -- "1..*" ComputeNode
+ComputeNode -- "0..*" Microservice
+Application -- "1..*" Microservice
+Application -- "0..*" ExternalEndpoint
+ExternalEndpoint <|-- Thing
+ExternalEndpoint <|-- Service
+@enduml

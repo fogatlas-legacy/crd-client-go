@@ -1,0 +1,44 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: links.fogatlas.fbk.eu
+  annotations:
+    "helm.sh/hook": crd-install
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  group: fogatlas.fbk.eu
+  version: v1alpha1
+  names:
+    kind: Link
+    plural: links
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+   openAPIV3Schema:
+     type: object
+     properties:
+        spec:
+          type: object
+          properties:
+            id:
+              type: string
+              description: id of the link
+            endpointa:
+              type: string
+              description: id of the region A connected through the link
+            endpointb:
+              type: string
+              description: id of the region B connected through the link
+            bwpeak:
+              type: integer
+              description: maximum bandwidth (bps) of the link
+            bwmeasured:
+              type: integer
+              description: maximum bandwidth (bps) currently measured on the link
+            latency:
+              type: integer
+              description: latency (ms) of the link
+            status:
+              type: string
+              description: status (up/down) of the link [curently not used]

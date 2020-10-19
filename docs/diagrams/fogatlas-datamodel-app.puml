@@ -1,0 +1,19 @@
+@startuml
+skinparam monochrome true
+'legend top left
+'Data model style
+'Generalization style
+'end legend
+
+Object Microservice
+Object Application <<FADepl>>
+Object DataFlow
+Object Vertex
+Object "External Endpoint" as ExternalEndpoint
+
+Application -- "1..*" Vertex
+Vertex <|-- ExternalEndpoint
+Vertex <|-- Microservice
+Application -- "1..*" DataFlow
+DataFlow -right-- "2" Vertex
+@enduml

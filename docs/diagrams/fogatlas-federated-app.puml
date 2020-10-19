@@ -1,0 +1,28 @@
+@startuml
+skinparam monochrome true
+'legend top left
+'Data model style
+'Generalization style
+'end legend
+
+Object "Application Chunk" as AppChunk
+Object "Chunk2Chunk\nDataflow" as C2CDF
+
+Object Microservice
+Object "Federated\nApplication" as FedApp
+Object "Vertex2Vertex\nDataFlow" as V2VDF
+Object Vertex
+Object "External Endpoint" as ExternalEndpoint
+
+AppChunk : FADepl
+AppChunk : placementInfo
+
+FedApp -- "1..*" AppChunk
+FedApp -- "0..*" C2CDF
+C2CDF -right-- "2" AppChunk
+AppChunk -- "1..*" Vertex
+AppChunk -- "0..*" V2VDF
+Vertex <|-- ExternalEndpoint
+Vertex <|-- Microservice
+V2VDF -right-- "2" Vertex
+@enduml
