@@ -1,5 +1,5 @@
 /*
-Modification:
+Derived work:
 Copyright 2019 FBK
 Slightly modified in order to adapt to the geok8s needs.
 
