@@ -1,0 +1,185 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: fadepls.fogatlas.fbk.eu
+spec:
+  group: fogatlas.fbk.eu
+  names:
+    kind: FADepl
+    listKind: FADeplList
+    plural: fadepls
+    singular: fadepl
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: FADepl is a specification for a FADepl resource
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FADeplSpec is the spec for a FADepl resource
+            properties:
+              algorithm:
+                type: string
+              dataflows:
+                items:
+                  description: FADeplDataFlow represent a data flow
+                  properties:
+                    bandwidthrequired:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    destinationid:
+                      type: string
+                    latency:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    metadata:
+                      type: object
+                    sourceid:
+                      type: string
+                  required:
+                  - bandwidthrequired
+                  - destinationid
+                  - latency
+                  - sourceid
+                  type: object
+                type: array
+              externalendpoints:
+                items:
+                  type: string
+                type: array
+              microservices:
+                items:
+                  description: FADeplMicroservice represent a FADepl microservice
+                  properties:
+                    deployment:
+                      type: object
+                      x-kubernetes-embedded-resource: true
+                      x-kubernetes-preserve-unknown-fields: true
+                    mipsrequired:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    name:
+                      type: string
+                    regions:
+                      items:
+                        description: FARegion represents a region inside a FADepl
+                        properties:
+                          cpu2mipsmilli:
+                            format: int64
+                            type: integer
+                          image:
+                            type: string
+                          regionrequired:
+                            type: string
+                          regionselected:
+                            type: string
+                          replicas:
+                            format: int32
+                            type: integer
+                        type: object
+                      type: array
+                  required:
+                  - deployment
+                  - name
+                  type: object
+                type: array
+            required:
+            - algorithm
+            - externalendpoints
+            - microservices
+            type: object
+          status:
+            description: FADeplStatus is the status for a FADepl resource
+            properties:
+              currentstatus:
+                description: FAStatus is a type for the possibile status values
+                format: int32
+                type: integer
+              linksoccupancy:
+                items:
+                  description: FALinkOccupancy stores the link occupancy
+                  properties:
+                    bwallocated:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    ischanged:
+                      type: boolean
+                    linkid:
+                      type: string
+                  required:
+                  - bwallocated
+                  - ischanged
+                  - linkid
+                  type: object
+                type: array
+              placements:
+                items:
+                  description: FAPlacement maps micrsoervices on regions
+                  properties:
+                    microservice:
+                      type: string
+                    regions:
+                      items:
+                        description: FARegion represents a region inside a FADepl
+                        properties:
+                          cpu2mipsmilli:
+                            format: int64
+                            type: integer
+                          image:
+                            type: string
+                          regionrequired:
+                            type: string
+                          regionselected:
+                            type: string
+                          replicas:
+                            format: int32
+                            type: integer
+                        type: object
+                      type: array
+                  required:
+                  - microservice
+                  - regions
+                  type: object
+                type: array
+            required:
+            - currentstatus
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

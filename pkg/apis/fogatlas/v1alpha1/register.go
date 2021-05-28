@@ -43,6 +43,7 @@ func Resource(resource string) schema.GroupResource {
 	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }
 
+// Exported variables
 var (
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 	AddToScheme   = SchemeBuilder.AddToScheme
@@ -71,8 +72,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&DynamicNodeList{},
 	)
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&FedFADepl{},
-		&FedFADeplList{},
+		&FedFAApp{},
+		&FedFAAppList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

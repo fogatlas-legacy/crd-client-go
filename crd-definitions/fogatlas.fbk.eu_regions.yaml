@@ -1,0 +1,83 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: regions.fogatlas.fbk.eu
+spec:
+  group: fogatlas.fbk.eu
+  names:
+    kind: Region
+    listKind: RegionList
+    plural: regions
+    singular: region
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Region is a specification for a Region resource
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RegionSpec is the spec for a Region resource
+            properties:
+              cpu2mips:
+                format: int64
+                type: integer
+              cpumodel:
+                type: string
+              description:
+                type: string
+              id:
+                type: string
+              location:
+                type: string
+              name:
+                type: string
+              tier:
+                format: int32
+                type: integer
+              type:
+                description: RegionType is the type of a Region resource. Could be nodes, clusters, hostcluster
+                type: string
+            required:
+            - cpu2mips
+            - cpumodel
+            - id
+            - location
+            - name
+            - tier
+            type: object
+          status:
+            description: RegionStatus is not used at the moment
+            properties:
+              currentStatus:
+                format: int32
+                type: integer
+            required:
+            - currentStatus
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

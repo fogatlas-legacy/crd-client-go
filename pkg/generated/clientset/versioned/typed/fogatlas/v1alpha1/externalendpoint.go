@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"time"
 
 	v1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
@@ -37,15 +38,15 @@ type ExternalEndpointsGetter interface {
 
 // ExternalEndpointInterface has methods to work with ExternalEndpoint resources.
 type ExternalEndpointInterface interface {
-	Create(*v1alpha1.ExternalEndpoint) (*v1alpha1.ExternalEndpoint, error)
-	Update(*v1alpha1.ExternalEndpoint) (*v1alpha1.ExternalEndpoint, error)
-	UpdateStatus(*v1alpha1.ExternalEndpoint) (*v1alpha1.ExternalEndpoint, error)
-	Delete(name string, options *v1.DeleteOptions) error
-	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.ExternalEndpoint, error)
-	List(opts v1.ListOptions) (*v1alpha1.ExternalEndpointList, error)
-	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ExternalEndpoint, err error)
+	Create(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.CreateOptions) (*v1alpha1.ExternalEndpoint, error)
+	Update(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.UpdateOptions) (*v1alpha1.ExternalEndpoint, error)
+	UpdateStatus(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.UpdateOptions) (*v1alpha1.ExternalEndpoint, error)
+	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.ExternalEndpoint, error)
+	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.ExternalEndpointList, error)
+	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ExternalEndpoint, err error)
 	ExternalEndpointExpansion
 }
 
@@ -64,20 +65,20 @@ func newExternalEndpoints(c *FogatlasV1alpha1Client, namespace string) *external
 }
 
 // Get takes name of the externalEndpoint, and returns the corresponding externalEndpoint object, and an error if there is any.
-func (c *externalEndpoints) Get(name string, options v1.GetOptions) (result *v1alpha1.ExternalEndpoint, err error) {
+func (c *externalEndpoints) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ExternalEndpoint, err error) {
 	result = &v1alpha1.ExternalEndpoint{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("externalendpoints").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of ExternalEndpoints that match those selectors.
-func (c *externalEndpoints) List(opts v1.ListOptions) (result *v1alpha1.ExternalEndpointList, err error) {
+func (c *externalEndpoints) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.ExternalEndpointList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -88,13 +89,13 @@ func (c *externalEndpoints) List(opts v1.ListOptions) (result *v1alpha1.External
 		Resource("externalendpoints").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested externalEndpoints.
-func (c *externalEndpoints) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *externalEndpoints) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -105,87 +106,90 @@ func (c *externalEndpoints) Watch(opts v1.ListOptions) (watch.Interface, error) 
 		Resource("externalendpoints").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a externalEndpoint and creates it.  Returns the server's representation of the externalEndpoint, and an error, if there is any.
-func (c *externalEndpoints) Create(externalEndpoint *v1alpha1.ExternalEndpoint) (result *v1alpha1.ExternalEndpoint, err error) {
+func (c *externalEndpoints) Create(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.CreateOptions) (result *v1alpha1.ExternalEndpoint, err error) {
 	result = &v1alpha1.ExternalEndpoint{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("externalendpoints").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(externalEndpoint).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a externalEndpoint and updates it. Returns the server's representation of the externalEndpoint, and an error, if there is any.
-func (c *externalEndpoints) Update(externalEndpoint *v1alpha1.ExternalEndpoint) (result *v1alpha1.ExternalEndpoint, err error) {
+func (c *externalEndpoints) Update(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.UpdateOptions) (result *v1alpha1.ExternalEndpoint, err error) {
 	result = &v1alpha1.ExternalEndpoint{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("externalendpoints").
 		Name(externalEndpoint.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(externalEndpoint).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *externalEndpoints) UpdateStatus(externalEndpoint *v1alpha1.ExternalEndpoint) (result *v1alpha1.ExternalEndpoint, err error) {
+func (c *externalEndpoints) UpdateStatus(ctx context.Context, externalEndpoint *v1alpha1.ExternalEndpoint, opts v1.UpdateOptions) (result *v1alpha1.ExternalEndpoint, err error) {
 	result = &v1alpha1.ExternalEndpoint{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("externalendpoints").
 		Name(externalEndpoint.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(externalEndpoint).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the externalEndpoint and deletes it. Returns an error if one occurs.
-func (c *externalEndpoints) Delete(name string, options *v1.DeleteOptions) error {
+func (c *externalEndpoints) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("externalendpoints").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *externalEndpoints) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *externalEndpoints) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("externalendpoints").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched externalEndpoint.
-func (c *externalEndpoints) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ExternalEndpoint, err error) {
+func (c *externalEndpoints) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ExternalEndpoint, err error) {
 	result = &v1alpha1.ExternalEndpoint{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("externalendpoints").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

@@ -26,8 +26,10 @@ import (
 )
 
 // DynamicNodeLister helps list DynamicNodes.
+// All objects returned here must be treated as read-only.
 type DynamicNodeLister interface {
 	// List lists all DynamicNodes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.DynamicNode, err error)
 	// DynamicNodes returns an object that can list and get DynamicNodes.
 	DynamicNodes(namespace string) DynamicNodeNamespaceLister
@@ -58,10 +60,13 @@ func (s *dynamicNodeLister) DynamicNodes(namespace string) DynamicNodeNamespaceL
 }
 
 // DynamicNodeNamespaceLister helps list and get DynamicNodes.
+// All objects returned here must be treated as read-only.
 type DynamicNodeNamespaceLister interface {
 	// List lists all DynamicNodes in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.DynamicNode, err error)
 	// Get retrieves the DynamicNode from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.DynamicNode, error)
 	DynamicNodeNamespaceListerExpansion
 }

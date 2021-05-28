@@ -10,72 +10,59 @@ Types in FogAtlas are defined starting from the following domain models: the fir
 a distributed infrastructure while the second models an application as a graph of vertices (microservices)
 and edges (dataflows).
 
-![infrastructure model](./docs/images/fogatlas-datamodel-infra.png)
+![Infrastructure model](./docs/images/fogatlas-datamodel-infra.png)
 *infrastructure model*
 
-![application model](./docs/images/fogatlas-datamodel-app.png)
+![Application model](./docs/images/fogatlas-datamodel-app.png)
 *application model*
+
+![Federated application model](./docs/images/fogatlas-datamodel-fedapp.png)
+*federated application model*
 
 From these models the CRD definition are derived.
 
-In the folder _crd_definitions_ you can find (in yaml format) the CRDs that extend the k8s resources:
-* _crd_dynamicnode.yaml_: used only by the provisioning phase. Currently not used.
-* _crd_externalendpoint.yaml_: defines an external endpoint (sensor, camera or external service)
-* _crd_fadepl.yaml_: defines a so called FogAtlas deployment (FADepl) that models a cloud native application.
-* _crd_fedfadepl.yaml_: extension of FADepl for multi-cluster. Not used at the moment
-* _crd_region.yaml_: defines a region interconnected by a Link
-* _crd_link.yaml_: defines a network link between two Regions
+In the folder `crd_definitions` you can find (in yaml format) the CRDs that extend the k8s resources:
+* _fogatlas.fbk.eu_dynamicnode.yaml_: used only by the provisioning phase. Currently not used.
+* _fogatlas.fbk.eu_externalendpoint.yaml_: defines an external endpoint (sensor, camera or external service).
+* _fogatlas.fbk.eu_fadepl.yaml_: defines a so called FogAtlas deployment (FADepl) that models a cloud native application.
+* _fogatlas.fbk.eu_fedfaapp.yaml_: extension of FADepl for federated multi-clusters. Not used at the moment.
+* _fogatlas.fbk.eu_region.yaml_: defines a region interconnected by a Link.
+* _fogatlas.fbk.eu_link.yaml_: defines a network link between two Regions.
 
 The file [_types.go_](pkg/apis/fogatlas/v1alpha1/types.go) defines programmatically the aforementioned CRDs.
 
 ## How to define or change CRDs
-1. Define three files in pkg/apis/<api-group>/v1alpha1
+1. Write/Update these three files in `pkg/apis/<api-group>/v1alpha1`
    * _doc.go_ where global generation tags are defined
    * _types.go_ where custom types are defined
    * _register.go_ where custom types are registered to the k8s API
-2. Use _update-codegen.sh_ script to generate the code. This step needs:
-   * go get k8s.io/code-generator
-   * go get k8s.io/apimachinery
-3. Align the files inside _crd_definitions_ to the _types.go_  
+2. Use `./hack/update-codegen.sh` script to generate the code. This step needs:
+   ```sh
+   go get k8s.io/code-generator
+   go get k8s.io/apimachinery
+   ```
+3. Use `./hack/gen_crd.sh` to generate the corresponding crd. This step needs:
+   ```sh
+   go get sigs.k8s.io/controller-tools/cmd/controller-gen
+   ```  
+4. (Optional, in case of use of helm) Add the following lines to the annotation field of the generated crd:
+   ```sh
+   "helm.sh/hook": pre-install
+   "helm.sh/hook-delete-policy": before-hook-creation
+   ```  
+The steps 1-3 can be executed with a convenient Makefile tag.
 
 ## How to install CRDs
 
 In order to install the defined CRD on a k8s cluster, just do the following:
 ```sh
 cd crd-definitions
-kubectl apply -f crd_region.yaml
-kubectl apply -f crd_link.yaml
-kubectl apply -f crd_externalendpoint.yaml
-kubectl apply -f crd_fadepl.yaml
+kubectl apply -f fogatlas.fbk.eu_region.yaml
+kubectl apply -f fogatlas.fbk.eu_link.yaml
+kubectl apply -f fogatlas.fbk.eu_externalendpoint.yaml
+kubectl apply -f fogatlas.fbk.eu_fadepl.yaml
+kubectl apply -f fogatlas.fbk.eu_ffedfaapp.yaml
 ```
-
-## How to test
-
-The file _main.go_ provides an example on how to call both k8s vanilla API
-(_get nodes()_ belonging to a k8s cluster) and Fogatlas API (_get regions()_ configured on a k8s cluster).
-Of course in order to use it, you need a k8s cluster where the aforementioned CRDs are loaded
-(see above) and where some instances of Region are defined. Moreover if you don't access the cluster
-as k8s admin, you might need additional RBAC setup.
-
-The syntax to launch the _main.go_ is as follows:
-
-```sh
-go run main.go --kubeconfig=<kube config path> --loglevel=<log level>
-```
-where _kube config path_ is the path where the k8s configuration file to access the cluster is stored
-and _log level_ is the level of the log (use "trace").
-
-## Schema validation.
-
-With CRD v1beta1, we use the following section:
-
-```sh
-validation:
-  openAPIV3Schema:
-```
-For activating the validation of the different fields, we need to create a so called _structural schema_.
-If you want to impose some constraints on the schema, you need to use _allOf_, _oneOf_ etc. keywords.
-An example can be found in the _crd_fadepl.yaml_ file.  
 
 ## License
 

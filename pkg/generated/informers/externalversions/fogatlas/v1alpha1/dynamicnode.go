@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	time "time"
 
 	fogatlasv1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
@@ -61,13 +62,13 @@ func NewFilteredDynamicNodeInformer(client versioned.Interface, namespace string
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FogatlasV1alpha1().DynamicNodes(namespace).List(options)
+				return client.FogatlasV1alpha1().DynamicNodes(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FogatlasV1alpha1().DynamicNodes(namespace).Watch(options)
+				return client.FogatlasV1alpha1().DynamicNodes(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&fogatlasv1alpha1.DynamicNode{},

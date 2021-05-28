@@ -26,8 +26,10 @@ import (
 )
 
 // ExternalEndpointLister helps list ExternalEndpoints.
+// All objects returned here must be treated as read-only.
 type ExternalEndpointLister interface {
 	// List lists all ExternalEndpoints in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.ExternalEndpoint, err error)
 	// ExternalEndpoints returns an object that can list and get ExternalEndpoints.
 	ExternalEndpoints(namespace string) ExternalEndpointNamespaceLister
@@ -58,10 +60,13 @@ func (s *externalEndpointLister) ExternalEndpoints(namespace string) ExternalEnd
 }
 
 // ExternalEndpointNamespaceLister helps list and get ExternalEndpoints.
+// All objects returned here must be treated as read-only.
 type ExternalEndpointNamespaceLister interface {
 	// List lists all ExternalEndpoints in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.ExternalEndpoint, err error)
 	// Get retrieves the ExternalEndpoint from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.ExternalEndpoint, error)
 	ExternalEndpointNamespaceListerExpansion
 }

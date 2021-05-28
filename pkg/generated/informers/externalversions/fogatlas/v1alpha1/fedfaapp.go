@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	time "time"
 
 	fogatlasv1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
@@ -31,59 +32,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// FedFADeplInformer provides access to a shared informer and lister for
-// FedFADepls.
-type FedFADeplInformer interface {
+// FedFAAppInformer provides access to a shared informer and lister for
+// FedFAApps.
+type FedFAAppInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.FedFADeplLister
+	Lister() v1alpha1.FedFAAppLister
 }
 
-type fedFADeplInformer struct {
+type fedFAAppInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewFedFADeplInformer constructs a new informer for FedFADepl type.
+// NewFedFAAppInformer constructs a new informer for FedFAApp type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFedFADeplInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredFedFADeplInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewFedFAAppInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredFedFAAppInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredFedFADeplInformer constructs a new informer for FedFADepl type.
+// NewFilteredFedFAAppInformer constructs a new informer for FedFAApp type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredFedFADeplInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredFedFAAppInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FogatlasV1alpha1().FedFADepls(namespace).List(options)
+				return client.FogatlasV1alpha1().FedFAApps(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FogatlasV1alpha1().FedFADepls(namespace).Watch(options)
+				return client.FogatlasV1alpha1().FedFAApps(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&fogatlasv1alpha1.FedFADepl{},
+		&fogatlasv1alpha1.FedFAApp{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *fedFADeplInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredFedFADeplInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *fedFAAppInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredFedFAAppInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *fedFADeplInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&fogatlasv1alpha1.FedFADepl{}, f.defaultInformer)
+func (f *fedFAAppInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&fogatlasv1alpha1.FedFAApp{}, f.defaultInformer)
 }
 
-func (f *fedFADeplInformer) Lister() v1alpha1.FedFADeplLister {
-	return v1alpha1.NewFedFADeplLister(f.Informer().GetIndexer())
+func (f *fedFAAppInformer) Lister() v1alpha1.FedFAAppLister {
+	return v1alpha1.NewFedFAAppLister(f.Informer().GetIndexer())
 }

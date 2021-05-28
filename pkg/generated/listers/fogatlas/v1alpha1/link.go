@@ -26,8 +26,10 @@ import (
 )
 
 // LinkLister helps list Links.
+// All objects returned here must be treated as read-only.
 type LinkLister interface {
 	// List lists all Links in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.Link, err error)
 	// Links returns an object that can list and get Links.
 	Links(namespace string) LinkNamespaceLister
@@ -58,10 +60,13 @@ func (s *linkLister) Links(namespace string) LinkNamespaceLister {
 }
 
 // LinkNamespaceLister helps list and get Links.
+// All objects returned here must be treated as read-only.
 type LinkNamespaceLister interface {
 	// List lists all Links in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.Link, err error)
 	// Get retrieves the Link from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.Link, error)
 	LinkNamespaceListerExpansion
 }

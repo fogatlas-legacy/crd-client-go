@@ -26,8 +26,10 @@ import (
 )
 
 // RegionLister helps list Regions.
+// All objects returned here must be treated as read-only.
 type RegionLister interface {
 	// List lists all Regions in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.Region, err error)
 	// Regions returns an object that can list and get Regions.
 	Regions(namespace string) RegionNamespaceLister
@@ -58,10 +60,13 @@ func (s *regionLister) Regions(namespace string) RegionNamespaceLister {
 }
 
 // RegionNamespaceLister helps list and get Regions.
+// All objects returned here must be treated as read-only.
 type RegionNamespaceLister interface {
 	// List lists all Regions in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.Region, err error)
 	// Get retrieves the Region from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.Region, error)
 	RegionNamespaceListerExpansion
 }

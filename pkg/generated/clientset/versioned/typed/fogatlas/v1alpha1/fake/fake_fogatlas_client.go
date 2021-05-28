@@ -40,8 +40,8 @@ func (c *FakeFogatlasV1alpha1) FADepls(namespace string) v1alpha1.FADeplInterfac
 	return &FakeFADepls{c, namespace}
 }
 
-func (c *FakeFogatlasV1alpha1) FedFADepls(namespace string) v1alpha1.FedFADeplInterface {
-	return &FakeFedFADepls{c, namespace}
+func (c *FakeFogatlasV1alpha1) FedFAApps(namespace string) v1alpha1.FedFAAppInterface {
+	return &FakeFedFAApps{c, namespace}
 }
 
 func (c *FakeFogatlasV1alpha1) Links(namespace string) v1alpha1.LinkInterface {

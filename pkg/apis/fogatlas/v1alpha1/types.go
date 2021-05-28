@@ -26,12 +26,15 @@ package v1alpha1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
+// FAStatus is a type for the possibile status values
 type FAStatus int32
 
+// Possible values of FAStaus
 const (
 	New FAStatus = iota
 	Synced
@@ -43,34 +46,43 @@ const (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // FADepl is a specification for a FADepl resource
+// +kubebuilder:subresource:status
 type FADepl struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   FADeplSpec   `json:"spec"`
-	Status FADeplStatus `json:"status"`
+	Status FADeplStatus `json:"status,omitempty"`
 }
 
+// FADeplMicroservice represent a FADepl microservice
 type FADeplMicroservice struct {
 	Name         string            `json:"name"`
 	Regions      []*FARegion       `json:"regions,omitempty"`
-	MIPSRequired int64             `json:"mipsrequired,omitempty"`
-	Deployment   appsv1.Deployment `json:"deployment"`
+	MIPSRequired resource.Quantity `json:"mipsrequired,omitempty"`
+	// +kubebuilder:validation:EmbeddedResource
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
+	// +kubebuilder:validation:Type=object
+	Deployment appsv1.Deployment `json:"deployment"`
 }
 
+// FARegion represents a region inside a FADepl
 type FARegion struct {
 	RegionRequired string `json:"regionrequired,omitempty"`
-	RegionSelected string `json:"regionselected"`
+	RegionSelected string `json:"regionselected,omitempty"`
 	Replicas       int32  `json:"replicas,omitempty"`
 	Image          string `json:"image,omitempty"`
 	CPU2MIPSMilli  int64  `json:"cpu2mipsmilli,omitempty"`
 }
 
+// FADeplDataFlow represent a data flow
 type FADeplDataFlow struct {
-	BandwidthRequired int32  `json:"bandwidthrequired"`
-	LatencyRequired   int32  `json:"latency"`
-	SourceId          string `json:"sourceid"`
-	DestinationId     string `json:"destinationid"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	BandwidthRequired resource.Quantity `json:"bandwidthrequired"`
+	LatencyRequired   resource.Quantity `json:"latency"`
+	SourceID          string            `json:"sourceid"`
+	DestinationID     string            `json:"destinationid"`
 }
 
 // FADeplSpec is the spec for a FADepl resource
@@ -88,15 +100,17 @@ type FADeplStatus struct {
 	CurrentStatus  FAStatus           `json:"currentstatus"`
 }
 
+// FAPlacement maps micrsoervices on regions
 type FAPlacement struct {
 	Regions      []*FARegion `json:"regions"`
 	Microservice string      `json:"microservice"`
 }
 
+// FALinkOccupancy stores the link occupancy
 type FALinkOccupancy struct {
-	LinkId      string `json:"linkid"`
-	BwAllocated int32  `json:"bwallocated"`
-	IsChanged   bool   `json:"ischanged"`
+	LinkID      string            `json:"linkid"`
+	BwAllocated resource.Quantity `json:"bwallocated"`
+	IsChanged   bool              `json:"ischanged"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -114,59 +128,62 @@ type FADeplList struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// FedFADepl is a specification for a FedFADepl resource
-type FedFADepl struct {
+// FedFAApp is a specification for a FedFAApp resource
+// +kubebuilder:subresource:status
+type FedFAApp struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   FedFADeplSpec `json:"spec"`
-	Status FADeplStatus  `json:"status"`
+	Spec   FedFAAppSpec `json:"spec"`
+	Status FADeplStatus `json:"status"`
 }
 
-type FedFADeplMicroservice struct {
-	Name                string                    `json:"name"`
-	FederatedDeployment unstructured.Unstructured `json:"federateddeployment"`
+// FedFAAppChunk represents a chunk (piece) of a federated application
+type FedFAAppChunk struct {
+	Name            string                    `json:"name"`
+	FederatedFADepl unstructured.Unstructured `json:"chunk"`
 }
 
-// FedFADeplSpec is the spec for a FADepl resource
-type FedFADeplSpec struct {
-	Name              string                   `json:"name"`
-	Description       string                   `json:"description"`
-	ExternalEndpoints []string                 `json:"externalendpoints"`
-	Microservices     []*FedFADeplMicroservice `json:"microservices"`
-	DataFlows         []*FADeplDataFlow        `json:"dataflows"`
-	Algorithm         string                   `json:"algorithm"`
+// FedFAAppSpec is the spec for a FADepl resource
+type FedFAAppSpec struct {
+	Name              string            `json:"name"`
+	Description       string            `json:"description"`
+	ApplicationChunks []*FedFAAppChunk  `json:"applicationchunks"`
+	DataFlows         []*FADeplDataFlow `json:"c2cdataflows"`
+	Algorithm         string            `json:"algorithm"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// FedFADeplList is a list of FedFADepl resources
-type FedFADeplList struct {
+// FedFAAppList is a list of FedFAApp resources
+type FedFAAppList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 
-	Items []FedFADepl `json:"items"`
+	Items []FedFAApp `json:"items"`
 }
 
-//END OF FedFADepl
+//END OF FedFAApp
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Region is a specification for a Region resource
+// +kubebuilder:subresource:status
 type Region struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RegionSpec   `json:"spec"`
-	Status RegionStatus `json:"status"`
+	Spec RegionSpec `json:"spec"`
+	// RegionStatus is not used at the moment
+	Status RegionStatus `json:"status,omitempty"`
 }
 
 // RegionSpec is the spec for a Region resource
 type RegionSpec struct {
-	Id          string     `json:"id"`
+	ID          string     `json:"id"`
 	Name        string     `json:"name"`
-	Description string     `json:"description"`
+	Description string     `json:"description,omitempty"`
 	Location    string     `json:"location"`
 	Tier        int32      `json:"tier"`
 	Type        RegionType `json:"type,omitempty"`
@@ -174,10 +191,10 @@ type RegionSpec struct {
 	CPU2MIPS    int64      `json:"cpu2mips"`
 }
 
-// RegionType is the type of a Region resource
-// nodes, clusters
+// RegionType is the type of a Region resource. Could be nodes, clusters, hostcluster
 type RegionType string
 
+// Possibile values of RegionType
 const (
 	Nodes       RegionType = "nodes"
 	Clusters    RegionType = "clusters"
@@ -205,23 +222,25 @@ type RegionList struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ExternalEndpoint is a specification for a ExternalEndpoint resource
+// +kubebuilder:subresource:status
 type ExternalEndpoint struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ExternalEndpointSpec   `json:"spec"`
-	Status ExternalEndpointStatus `json:"status"`
+	Spec ExternalEndpointSpec `json:"spec"`
+	// RegionStatus is not used at the moment
+	Status ExternalEndpointStatus `json:"status,omitempty"`
 }
 
 // ExternalEndpointSpec is the spec for a ExternalEndpoint resource
 type ExternalEndpointSpec struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Type        string `json:"type"`
 	Name        string `json:"name"`
-	Description string `json:"description"`
-	IpAddress   string `json:"ipaddress"`
+	Description string `json:"description,omitempty"`
+	IPAddress   string `json:"ipaddress"`
 	Location    string `json:"location"`
-	RegionId    string `json:"regionid"`
+	RegionID    string `json:"regionid"`
 }
 
 // ExternalEndpointStatus is the status for a ExternalEndpoint resource
@@ -245,29 +264,30 @@ type ExternalEndpointList struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Link is a specification for a Link resource
+// +kubebuilder:subresource:status
 type Link struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   LinkSpec   `json:"spec"`
-	Status LinkStatus `json:"status"`
+	Status LinkStatus `json:"status,omitempty"`
 }
 
 // LinkSpec is the spec for a Link resource
 type LinkSpec struct {
-	Id         string `json:"id"`
-	EndpointA  string `json:"endpointa"`
-	EndpointB  string `json:"endpointb"`
-	BwPeak     int32  `json:"bwpeak"`
-	BwMeasured int32  `json:"bwmeasured"`
-	Latency    int32  `json:"latency"`
-	Status     string `json:"status"`
+	ID        string            `json:"id"`
+	EndpointA string            `json:"endpointa"`
+	EndpointB string            `json:"endpointb"`
+	Bandwidth resource.Quantity `json:"bandwidth"`
+	// in milliseconds
+	Latency resource.Quantity `json:"latency"`
+	Status  string            `json:"status"`
 }
 
 // LinkStatus is the status for a Link resource
 type LinkStatus struct {
-	BwAllocated   int32 `json:"bwallocated"`
-	CurrentStatus int32 `json:"currentstatus"`
+	BwAllocated   resource.Quantity `json:"bwallocated"`
+	CurrentStatus int32             `json:"currentstatus"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -286,23 +306,24 @@ type LinkList struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // DynamicNode is a specification for a DynamicNode resource
+// +kubebuilder:subresource:status
 type DynamicNode struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   DynamicNodeSpec   `json:"spec"`
-	Status DynamicNodeStatus `json:"status"`
+	Status DynamicNodeStatus `json:"status,omitempty"`
 }
 
 // DynamicNodeSpec is the spec for a DynamicNode resource
 type DynamicNodeSpec struct {
-	Id              string        `json:"id"`
+	ID              string        `json:"id"`
 	Description     string        `json:"description"`
 	Location        string        `json:"location"`
 	Tier            int32         `json:"tier"`
-	IpAddress       string        `json:"ip_address"`
-	RegionId        string        `json:"region_id"`
-	AnsibleSshUser  string        `json:"ansible_ssh_user"`
+	IPAddress       string        `json:"ip_address"`
+	RegionID        string        `json:"region_id"`
+	AnsibleSSHUser  string        `json:"ansible_ssh_user"`
 	Architecture    string        `json:"architecture"`
 	Processor       string        `json:"processor"`
 	Gpu             string        `json:"gpu"`
@@ -312,23 +333,25 @@ type DynamicNodeSpec struct {
 	Status          DynamicStatus `json:"status"`
 }
 
+// DynamicStatus defined type represents the possibile statuses of a dynamic node
 type DynamicStatus string
 
+// Possible values of a dynamic node
 const (
-	Baremetal       DynamicStatus = "baremetal"
-	Vpnset          DynamicStatus = "vpnset"
-	Clustered       DynamicStatus = "clustered"
-	Free_ext        DynamicStatus = "free_ext"
-	Free            DynamicStatus = "free"
-	Advertised      DynamicStatus = "advertised"
-	Reserved_ext    DynamicStatus = "reserved_ext"
-	Reserved        DynamicStatus = "reserved"
-	Provisioned_ext DynamicStatus = "provisioned_ext"
-	Provisioned     DynamicStatus = "provisioned"
-	Provisioning    DynamicStatus = "provisioning"
-	Unprovisioning  DynamicStatus = "unprovisioning"
-	Clustering      DynamicStatus = "clustering"
-	Unclustering    DynamicStatus = "unclustering"
+	Baremetal      DynamicStatus = "baremetal"
+	Vpnset         DynamicStatus = "vpnset"
+	Clustered      DynamicStatus = "clustered"
+	FreeExt        DynamicStatus = "free_ext"
+	Free           DynamicStatus = "free"
+	Advertised     DynamicStatus = "advertised"
+	ReservedExt    DynamicStatus = "reserved_ext"
+	Reserved       DynamicStatus = "reserved"
+	ProvisionedExt DynamicStatus = "provisioned_ext"
+	Provisioned    DynamicStatus = "provisioned"
+	Provisioning   DynamicStatus = "provisioning"
+	Unprovisioning DynamicStatus = "unprovisioning"
+	Clustering     DynamicStatus = "clustering"
+	Unclustering   DynamicStatus = "unclustering"
 )
 
 // DynamicNodeStatus is the status for a DynamicNode resource

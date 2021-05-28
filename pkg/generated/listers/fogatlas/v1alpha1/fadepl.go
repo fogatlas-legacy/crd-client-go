@@ -26,8 +26,10 @@ import (
 )
 
 // FADeplLister helps list FADepls.
+// All objects returned here must be treated as read-only.
 type FADeplLister interface {
 	// List lists all FADepls in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.FADepl, err error)
 	// FADepls returns an object that can list and get FADepls.
 	FADepls(namespace string) FADeplNamespaceLister
@@ -58,10 +60,13 @@ func (s *fADeplLister) FADepls(namespace string) FADeplNamespaceLister {
 }
 
 // FADeplNamespaceLister helps list and get FADepls.
+// All objects returned here must be treated as read-only.
 type FADeplNamespaceLister interface {
 	// List lists all FADepls in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.FADepl, err error)
 	// Get retrieves the FADepl from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.FADepl, error)
 	FADeplNamespaceListerExpansion
 }

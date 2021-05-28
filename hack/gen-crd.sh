@@ -18,17 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 CODEGEN_PKG="$GOPATH/src/k8s.io/code-generator"
-# generate the code with:
-# --output-base    because this script should also be able to run inside the vendor dir of
-#                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
-#                  instead of the $GOPATH directly. For normal projects this can be dropped.
-"${CODEGEN_PKG}"/generate-groups.sh all \
-  gitlab.fbk.eu/fogatlas/crd-client-go/pkg/generated gitlab.fbk.eu/fogatlas/crd-client-go/pkg/apis \
-  fogatlas:v1alpha1 \
-  --go-header-file ./boilerplate.go.txt \
-  --output-base ../../../
-
-
-# To use your own boilerplate text append:
-#   --go-header-file "${SCRIPT_ROOT}"/hack/custom-boilerplate.go.txt
+# generate CRDs
+# If not yet done do:
+# go get sigs.k8s.io/controller-tools/cmd/controller-gen
+"${GOBIN}"/controller-gen crd paths=gitlab.fbk.eu/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1/ +output:dir="$SCRIPT_ROOT"/crd-definitions

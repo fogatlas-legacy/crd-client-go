@@ -5,17 +5,18 @@ skinparam monochrome true
 'Generalization style
 'end legend
 
-Object "Application Chunk" as AppChunk
+Object "Application Chunk" as AppChunk <<FederatedFADepl>>
 Object "Chunk2Chunk\nDataflow" as C2CDF
 
 Object Microservice
-Object "Federated\nApplication" as FedApp
+Object "Federated\nApplication"  as FedApp <<FedFAApp>>
 Object "Vertex2Vertex\nDataFlow" as V2VDF
 Object Vertex
 Object "External Endpoint" as ExternalEndpoint
 
-AppChunk : FADepl
+AppChunk : <<FADepl>>
 AppChunk : placementInfo
+AppChunk : overrideInfo
 
 FedApp -- "1..*" AppChunk
 FedApp -- "0..*" C2CDF

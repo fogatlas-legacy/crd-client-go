@@ -30,8 +30,8 @@ type Interface interface {
 	ExternalEndpoints() ExternalEndpointInformer
 	// FADepls returns a FADeplInformer.
 	FADepls() FADeplInformer
-	// FedFADepls returns a FedFADeplInformer.
-	FedFADepls() FedFADeplInformer
+	// FedFAApps returns a FedFAAppInformer.
+	FedFAApps() FedFAAppInformer
 	// Links returns a LinkInformer.
 	Links() LinkInformer
 	// Regions returns a RegionInformer.
@@ -64,9 +64,9 @@ func (v *version) FADepls() FADeplInformer {
 	return &fADeplInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// FedFADepls returns a FedFADeplInformer.
-func (v *version) FedFADepls() FedFADeplInformer {
-	return &fedFADeplInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// FedFAApps returns a FedFAAppInformer.
+func (v *version) FedFAApps() FedFAAppInformer {
+	return &fedFAAppInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Links returns a LinkInformer.

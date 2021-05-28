@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"time"
 
 	v1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
@@ -37,15 +38,15 @@ type FADeplsGetter interface {
 
 // FADeplInterface has methods to work with FADepl resources.
 type FADeplInterface interface {
-	Create(*v1alpha1.FADepl) (*v1alpha1.FADepl, error)
-	Update(*v1alpha1.FADepl) (*v1alpha1.FADepl, error)
-	UpdateStatus(*v1alpha1.FADepl) (*v1alpha1.FADepl, error)
-	Delete(name string, options *v1.DeleteOptions) error
-	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.FADepl, error)
-	List(opts v1.ListOptions) (*v1alpha1.FADeplList, error)
-	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.FADepl, err error)
+	Create(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.CreateOptions) (*v1alpha1.FADepl, error)
+	Update(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.UpdateOptions) (*v1alpha1.FADepl, error)
+	UpdateStatus(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.UpdateOptions) (*v1alpha1.FADepl, error)
+	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.FADepl, error)
+	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FADeplList, error)
+	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FADepl, err error)
 	FADeplExpansion
 }
 
@@ -64,20 +65,20 @@ func newFADepls(c *FogatlasV1alpha1Client, namespace string) *fADepls {
 }
 
 // Get takes name of the fADepl, and returns the corresponding fADepl object, and an error if there is any.
-func (c *fADepls) Get(name string, options v1.GetOptions) (result *v1alpha1.FADepl, err error) {
+func (c *fADepls) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.FADepl, err error) {
 	result = &v1alpha1.FADepl{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("fadepls").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of FADepls that match those selectors.
-func (c *fADepls) List(opts v1.ListOptions) (result *v1alpha1.FADeplList, err error) {
+func (c *fADepls) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.FADeplList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -88,13 +89,13 @@ func (c *fADepls) List(opts v1.ListOptions) (result *v1alpha1.FADeplList, err er
 		Resource("fadepls").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested fADepls.
-func (c *fADepls) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *fADepls) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -105,87 +106,90 @@ func (c *fADepls) Watch(opts v1.ListOptions) (watch.Interface, error) {
 		Resource("fadepls").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a fADepl and creates it.  Returns the server's representation of the fADepl, and an error, if there is any.
-func (c *fADepls) Create(fADepl *v1alpha1.FADepl) (result *v1alpha1.FADepl, err error) {
+func (c *fADepls) Create(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.CreateOptions) (result *v1alpha1.FADepl, err error) {
 	result = &v1alpha1.FADepl{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("fadepls").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(fADepl).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a fADepl and updates it. Returns the server's representation of the fADepl, and an error, if there is any.
-func (c *fADepls) Update(fADepl *v1alpha1.FADepl) (result *v1alpha1.FADepl, err error) {
+func (c *fADepls) Update(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.UpdateOptions) (result *v1alpha1.FADepl, err error) {
 	result = &v1alpha1.FADepl{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("fadepls").
 		Name(fADepl.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(fADepl).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *fADepls) UpdateStatus(fADepl *v1alpha1.FADepl) (result *v1alpha1.FADepl, err error) {
+func (c *fADepls) UpdateStatus(ctx context.Context, fADepl *v1alpha1.FADepl, opts v1.UpdateOptions) (result *v1alpha1.FADepl, err error) {
 	result = &v1alpha1.FADepl{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("fadepls").
 		Name(fADepl.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(fADepl).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the fADepl and deletes it. Returns an error if one occurs.
-func (c *fADepls) Delete(name string, options *v1.DeleteOptions) error {
+func (c *fADepls) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("fadepls").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *fADepls) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *fADepls) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("fadepls").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched fADepl.
-func (c *fADepls) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.FADepl, err error) {
+func (c *fADepls) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FADepl, err error) {
 	result = &v1alpha1.FADepl{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("fadepls").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

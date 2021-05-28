@@ -19,6 +19,8 @@ limitations under the License.
 package fake
 
 import (
+	"context"
+
 	v1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -39,7 +41,7 @@ var regionsResource = schema.GroupVersionResource{Group: "fogatlas.fbk.eu", Vers
 var regionsKind = schema.GroupVersionKind{Group: "fogatlas.fbk.eu", Version: "v1alpha1", Kind: "Region"}
 
 // Get takes name of the region, and returns the corresponding region object, and an error if there is any.
-func (c *FakeRegions) Get(name string, options v1.GetOptions) (result *v1alpha1.Region, err error) {
+func (c *FakeRegions) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Region, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(regionsResource, c.ns, name), &v1alpha1.Region{})
 
@@ -50,7 +52,7 @@ func (c *FakeRegions) Get(name string, options v1.GetOptions) (result *v1alpha1.
 }
 
 // List takes label and field selectors, and returns the list of Regions that match those selectors.
-func (c *FakeRegions) List(opts v1.ListOptions) (result *v1alpha1.RegionList, err error) {
+func (c *FakeRegions) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.RegionList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(regionsResource, regionsKind, c.ns, opts), &v1alpha1.RegionList{})
 
@@ -72,14 +74,14 @@ func (c *FakeRegions) List(opts v1.ListOptions) (result *v1alpha1.RegionList, er
 }
 
 // Watch returns a watch.Interface that watches the requested regions.
-func (c *FakeRegions) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeRegions) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(regionsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a region and creates it.  Returns the server's representation of the region, and an error, if there is any.
-func (c *FakeRegions) Create(region *v1alpha1.Region) (result *v1alpha1.Region, err error) {
+func (c *FakeRegions) Create(ctx context.Context, region *v1alpha1.Region, opts v1.CreateOptions) (result *v1alpha1.Region, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(regionsResource, c.ns, region), &v1alpha1.Region{})
 
@@ -90,7 +92,7 @@ func (c *FakeRegions) Create(region *v1alpha1.Region) (result *v1alpha1.Region, 
 }
 
 // Update takes the representation of a region and updates it. Returns the server's representation of the region, and an error, if there is any.
-func (c *FakeRegions) Update(region *v1alpha1.Region) (result *v1alpha1.Region, err error) {
+func (c *FakeRegions) Update(ctx context.Context, region *v1alpha1.Region, opts v1.UpdateOptions) (result *v1alpha1.Region, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(regionsResource, c.ns, region), &v1alpha1.Region{})
 
@@ -102,7 +104,7 @@ func (c *FakeRegions) Update(region *v1alpha1.Region) (result *v1alpha1.Region, 
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeRegions) UpdateStatus(region *v1alpha1.Region) (*v1alpha1.Region, error) {
+func (c *FakeRegions) UpdateStatus(ctx context.Context, region *v1alpha1.Region, opts v1.UpdateOptions) (*v1alpha1.Region, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(regionsResource, "status", c.ns, region), &v1alpha1.Region{})
 
@@ -113,7 +115,7 @@ func (c *FakeRegions) UpdateStatus(region *v1alpha1.Region) (*v1alpha1.Region, e
 }
 
 // Delete takes name of the region and deletes it. Returns an error if one occurs.
-func (c *FakeRegions) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeRegions) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(regionsResource, c.ns, name), &v1alpha1.Region{})
 
@@ -121,15 +123,15 @@ func (c *FakeRegions) Delete(name string, options *v1.DeleteOptions) error {
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeRegions) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(regionsResource, c.ns, listOptions)
+func (c *FakeRegions) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(regionsResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.RegionList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched region.
-func (c *FakeRegions) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.Region, err error) {
+func (c *FakeRegions) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Region, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(regionsResource, c.ns, name, pt, data, subresources...), &v1alpha1.Region{})
 

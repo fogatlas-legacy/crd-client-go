@@ -42,13 +42,13 @@ type FADeplListerExpansion interface{}
 // FADeplNamespaceLister.
 type FADeplNamespaceListerExpansion interface{}
 
-// FedFADeplListerExpansion allows custom methods to be added to
-// FedFADeplLister.
-type FedFADeplListerExpansion interface{}
+// FedFAAppListerExpansion allows custom methods to be added to
+// FedFAAppLister.
+type FedFAAppListerExpansion interface{}
 
-// FedFADeplNamespaceListerExpansion allows custom methods to be added to
-// FedFADeplNamespaceLister.
-type FedFADeplNamespaceListerExpansion interface{}
+// FedFAAppNamespaceListerExpansion allows custom methods to be added to
+// FedFAAppNamespaceLister.
+type FedFAAppNamespaceListerExpansion interface{}
 
 // LinkListerExpansion allows custom methods to be added to
 // LinkLister.

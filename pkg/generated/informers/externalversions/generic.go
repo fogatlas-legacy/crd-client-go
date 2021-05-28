@@ -59,8 +59,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Fogatlas().V1alpha1().ExternalEndpoints().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("fadepls"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Fogatlas().V1alpha1().FADepls().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("fedfadepls"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Fogatlas().V1alpha1().FedFADepls().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("fedfaapps"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Fogatlas().V1alpha1().FedFAApps().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("links"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Fogatlas().V1alpha1().Links().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("regions"):

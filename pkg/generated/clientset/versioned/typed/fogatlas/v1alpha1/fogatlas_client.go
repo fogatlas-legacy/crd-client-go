@@ -29,7 +29,7 @@ type FogatlasV1alpha1Interface interface {
 	DynamicNodesGetter
 	ExternalEndpointsGetter
 	FADeplsGetter
-	FedFADeplsGetter
+	FedFAAppsGetter
 	LinksGetter
 	RegionsGetter
 }
@@ -51,8 +51,8 @@ func (c *FogatlasV1alpha1Client) FADepls(namespace string) FADeplInterface {
 	return newFADepls(c, namespace)
 }
 
-func (c *FogatlasV1alpha1Client) FedFADepls(namespace string) FedFADeplInterface {
-	return newFedFADepls(c, namespace)
+func (c *FogatlasV1alpha1Client) FedFAApps(namespace string) FedFAAppInterface {
+	return newFedFAApps(c, namespace)
 }
 
 func (c *FogatlasV1alpha1Client) Links(namespace string) LinkInterface {

@@ -1,0 +1,37 @@
+# Defaults are defined for testing
+default :
+  image: golang:1.16
+  # The problem is that to be able to use go get, one needs to put
+  # the repository in the $GOPATH. So for example if your gitlab domain
+  # is gitlab.com, and that your repository is namespace/project, and
+  # the default GOPATH being /go, then you'd need to have your
+  # repository in /go/src/gitlab.com/namespace/project
+  # Thus, making a symbolic link corrects this.
+  before_script:
+    - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+    - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+    - cd $GOPATH/src/$REPO_NAME
+    - git config --global url."git@gitlab.fbk.eu:".insteadOf "https://gitlab.fbk.eu/"
+
+variables:
+  REPO_NAME: gitlab.fbk.eu/fogatlas/crd-client-go
+
+stages:
+  - build
+  - unit
+
+build_crd-client-go:
+  stage: build
+  script:
+    - go build
+
+test_crd-client-go:
+  stage: unit
+  script:
+    - go install golang.org/x/lint/golint@latest
+    - go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+    - go fmt $(go list ./... | grep -v /vendor/)
+    - golint $(go list ./... | grep -v /vendor/)
+    - go vet $(go list ./... | grep -v /vendor/)
+    - shadow $(go list ./... | grep -v /vendor/)
+    - go test -cover ./pkg/apis/fogatlas/v1alpha1

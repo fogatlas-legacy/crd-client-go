@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
+
 	flags "github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 
 	clientset "github.com/fogatlas/crd-client-go/pkg/generated/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/metadata"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// Options collects the possibile command line options
 type Options struct {
 	Kubeconfig string `long:"kubeconfig" description:"absolute path to the kubeconfig file."`
 	MasterURL  string `long:"master" description:"The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster."`
@@ -45,7 +50,8 @@ func main() {
 	}
 
 	// get nodes
-	nodes, err := kubeClient.CoreV1().Nodes().List(metav1.ListOptions{})
+	log.Tracef("Getting Nodes")
+	nodes, err := kubeClient.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error: (%s) ", err.Error())
 	}
@@ -59,14 +65,50 @@ func main() {
 	}
 
 	// get regions
-	regions, err := crdClient.FogatlasV1alpha1().Regions("default").List(metav1.ListOptions{})
+	log.Tracef("Getting Regions")
+	regions, err := crdClient.FogatlasV1alpha1().Regions("default").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error: (%s)", err.Error())
 	}
 	for _, r := range regions.Items {
-		log.Tracef("Region: (%s) (%s) (%s) (%s) (%d)", r.Spec.Id, r.Spec.Name, r.Spec.Description,
+		log.Tracef("Region: (%s) (%s) (%s) (%s) (%d)", r.Spec.ID, r.Spec.Name, r.Spec.Description,
 			r.Spec.Location, r.Spec.Tier)
 	}
+
+	// get fadepl
+	log.Tracef("Getting FADepls")
+	fadepls, err := crdClient.FogatlasV1alpha1().FADepls("default").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Fatalf("Error: (%s)", err.Error())
+	}
+	for _, fa := range fadepls.Items {
+		log.Tracef("JSON Fadepl : (%#v)", fa)
+		for _, ms := range fa.Spec.Microservices {
+			log.Tracef("MS name is (%s); replicas is (%d)", ms.Deployment.Name, *ms.Deployment.Spec.Replicas)
+		}
+	}
+
+	//get list of crds
+	log.Tracef("Getting CRDs")
+	metaClient, err := metadata.NewForConfig(cfg)
+	if err != nil {
+		log.Fatalf("Error building metadata clientset (%s)", err.Error())
+	}
+
+	gvr := schema.GroupVersionResource{
+		Group:    "apiextensions.k8s.io",
+		Version:  "v1",
+		Resource: "customresourcedefinitions",
+	}
+
+	crds, err := metaClient.Resource(gvr).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Fatalf("Error: (%s) ", err.Error())
+	}
+	for _, crd := range crds.Items {
+		log.Tracef("CRD: (%s)", crd.Name)
+	}
+
 }
 
 func configureLog() {

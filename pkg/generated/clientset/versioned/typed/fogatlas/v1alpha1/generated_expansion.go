@@ -24,7 +24,7 @@ type ExternalEndpointExpansion interface{}
 
 type FADeplExpansion interface{}
 
-type FedFADeplExpansion interface{}
+type FedFAAppExpansion interface{}
 
 type LinkExpansion interface{}
 

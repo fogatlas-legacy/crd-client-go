@@ -19,6 +19,8 @@ limitations under the License.
 package fake
 
 import (
+	"context"
+
 	v1alpha1 "github.com/fogatlas/crd-client-go/pkg/apis/fogatlas/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -39,7 +41,7 @@ var dynamicnodesResource = schema.GroupVersionResource{Group: "fogatlas.fbk.eu",
 var dynamicnodesKind = schema.GroupVersionKind{Group: "fogatlas.fbk.eu", Version: "v1alpha1", Kind: "DynamicNode"}
 
 // Get takes name of the dynamicNode, and returns the corresponding dynamicNode object, and an error if there is any.
-func (c *FakeDynamicNodes) Get(name string, options v1.GetOptions) (result *v1alpha1.DynamicNode, err error) {
+func (c *FakeDynamicNodes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.DynamicNode, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(dynamicnodesResource, c.ns, name), &v1alpha1.DynamicNode{})
 
@@ -50,7 +52,7 @@ func (c *FakeDynamicNodes) Get(name string, options v1.GetOptions) (result *v1al
 }
 
 // List takes label and field selectors, and returns the list of DynamicNodes that match those selectors.
-func (c *FakeDynamicNodes) List(opts v1.ListOptions) (result *v1alpha1.DynamicNodeList, err error) {
+func (c *FakeDynamicNodes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.DynamicNodeList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(dynamicnodesResource, dynamicnodesKind, c.ns, opts), &v1alpha1.DynamicNodeList{})
 
@@ -72,14 +74,14 @@ func (c *FakeDynamicNodes) List(opts v1.ListOptions) (result *v1alpha1.DynamicNo
 }
 
 // Watch returns a watch.Interface that watches the requested dynamicNodes.
-func (c *FakeDynamicNodes) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeDynamicNodes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(dynamicnodesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a dynamicNode and creates it.  Returns the server's representation of the dynamicNode, and an error, if there is any.
-func (c *FakeDynamicNodes) Create(dynamicNode *v1alpha1.DynamicNode) (result *v1alpha1.DynamicNode, err error) {
+func (c *FakeDynamicNodes) Create(ctx context.Context, dynamicNode *v1alpha1.DynamicNode, opts v1.CreateOptions) (result *v1alpha1.DynamicNode, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(dynamicnodesResource, c.ns, dynamicNode), &v1alpha1.DynamicNode{})
 
@@ -90,7 +92,7 @@ func (c *FakeDynamicNodes) Create(dynamicNode *v1alpha1.DynamicNode) (result *v1
 }
 
 // Update takes the representation of a dynamicNode and updates it. Returns the server's representation of the dynamicNode, and an error, if there is any.
-func (c *FakeDynamicNodes) Update(dynamicNode *v1alpha1.DynamicNode) (result *v1alpha1.DynamicNode, err error) {
+func (c *FakeDynamicNodes) Update(ctx context.Context, dynamicNode *v1alpha1.DynamicNode, opts v1.UpdateOptions) (result *v1alpha1.DynamicNode, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(dynamicnodesResource, c.ns, dynamicNode), &v1alpha1.DynamicNode{})
 
@@ -102,7 +104,7 @@ func (c *FakeDynamicNodes) Update(dynamicNode *v1alpha1.DynamicNode) (result *v1
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeDynamicNodes) UpdateStatus(dynamicNode *v1alpha1.DynamicNode) (*v1alpha1.DynamicNode, error) {
+func (c *FakeDynamicNodes) UpdateStatus(ctx context.Context, dynamicNode *v1alpha1.DynamicNode, opts v1.UpdateOptions) (*v1alpha1.DynamicNode, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(dynamicnodesResource, "status", c.ns, dynamicNode), &v1alpha1.DynamicNode{})
 
@@ -113,7 +115,7 @@ func (c *FakeDynamicNodes) UpdateStatus(dynamicNode *v1alpha1.DynamicNode) (*v1a
 }
 
 // Delete takes name of the dynamicNode and deletes it. Returns an error if one occurs.
-func (c *FakeDynamicNodes) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeDynamicNodes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(dynamicnodesResource, c.ns, name), &v1alpha1.DynamicNode{})
 
@@ -121,15 +123,15 @@ func (c *FakeDynamicNodes) Delete(name string, options *v1.DeleteOptions) error 
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeDynamicNodes) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(dynamicnodesResource, c.ns, listOptions)
+func (c *FakeDynamicNodes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(dynamicnodesResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.DynamicNodeList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched dynamicNode.
-func (c *FakeDynamicNodes) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.DynamicNode, err error) {
+func (c *FakeDynamicNodes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.DynamicNode, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(dynamicnodesResource, c.ns, name, pt, data, subresources...), &v1alpha1.DynamicNode{})
 
