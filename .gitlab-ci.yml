@@ -1,6 +1,6 @@
 # Defaults are defined for testing
 default :
-  image: golang:1.16
+  image: golang:1.18
   # The problem is that to be able to use go get, one needs to put
   # the repository in the $GOPATH. So for example if your gitlab domain
   # is gitlab.com, and that your repository is namespace/project, and

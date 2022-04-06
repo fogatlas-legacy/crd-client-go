@@ -45,11 +45,6 @@ The file [_types.go_](pkg/apis/fogatlas/v1alpha1/types.go) defines programmatica
    ```sh
    go get sigs.k8s.io/controller-tools/cmd/controller-gen
    ```  
-4. (Optional, in case of use of helm) Add the following lines to the annotation field of the generated crd:
-   ```sh
-   "helm.sh/hook": pre-install
-   "helm.sh/hook-delete-policy": before-hook-creation
-   ```  
 The steps 1-3 can be executed with a convenient Makefile tag.
 
 ## How to install CRDs

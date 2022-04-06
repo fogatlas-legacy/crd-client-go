@@ -78,7 +78,8 @@ type FARegion struct {
 
 // FADeplDataFlow represent a data flow
 type FADeplDataFlow struct {
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Name              string            `json:"name,omitempty"`
+	Labels            map[string]string `json:"labels,omitempty"`
 	BandwidthRequired resource.Quantity `json:"bandwidthrequired"`
 	LatencyRequired   resource.Quantity `json:"latency"`
 	SourceID          string            `json:"sourceid"`
@@ -108,9 +109,10 @@ type FAPlacement struct {
 
 // FALinkOccupancy stores the link occupancy
 type FALinkOccupancy struct {
-	LinkID      string            `json:"linkid"`
-	BwAllocated resource.Quantity `json:"bwallocated"`
-	IsChanged   bool              `json:"ischanged"`
+	LinkID          string            `json:"linkid"`
+	BwAllocated     resource.Quantity `json:"bwallocated"`
+	PrevBwAllocated resource.Quantity `json:"prevbwallocated"`
+	IsChanged       bool              `json:"ischanged"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
